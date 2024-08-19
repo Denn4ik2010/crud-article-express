@@ -8,3 +8,4 @@ export interface Article {
 type Nullable<T> = T | null | undefined
 
 export type ArticleOrNone = Nullable<Article>;
+export type Db = {articles: Article[]}
