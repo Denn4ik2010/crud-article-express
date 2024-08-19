@@ -49,7 +49,7 @@ app.get(
 
         if (req.query.title) {
             foundedArticles = foundedArticles.filter(
-                (a) => a.title.indexOf(req.query.title) < -1
+                (a) => a.title.indexOf(req.query.title) > -1
             );
         }
 
