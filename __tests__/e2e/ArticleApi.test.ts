@@ -46,6 +46,18 @@ describe('Article API', () => {
             .expect(200, article);
     });
 
+    it('Should return 200 HTTP status and return finded article by query param' , async () => {
+        const res = await request(app).get('/articles?title=est').expect(200)
+
+        expect(res.body).toEqual([{
+            id: expect.any(Number),
+            title: article.title,
+            author: article.author,
+            text: article.text,
+        }]);
+    })
+
+
     it('Should return 200 HTTP status and updated article', async () => {
         const data: UpdateArticleModel = {
             title: 'Second test title',
