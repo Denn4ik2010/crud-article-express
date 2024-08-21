@@ -1,4 +1,4 @@
-import { Db } from "../types/article-types";
+import { Db } from '../types/article-types';
 
 let db: Db = {
     articles: [

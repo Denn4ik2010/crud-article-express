@@ -12,5 +12,4 @@ export type UpdateArticleModel = {
      * (Optional) Full text of the article.
      */
     text: string;
-
 };
