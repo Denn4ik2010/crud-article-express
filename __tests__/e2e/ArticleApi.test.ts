@@ -1,8 +1,8 @@
 import request from 'supertest';
-import { app } from '../../src/index';
-import { Article } from '../../src/types/ArticleTypes';
-import { CreateArticleModel } from "../../src/models/CreateArticleModel";
-import {UpdateArticleModel} from "../../src/models/UpdateArticleModel"
+import app from '../../src/app/app';
+import { Article } from '../../src/app/types/article-types';
+import { CreateArticleModel } from "../../src/app/models/create-article.model";
+import {UpdateArticleModel} from "../../src/app/models/update-article.model"
 
 describe('Article API', () => {
     beforeAll(async () => {
@@ -10,7 +10,7 @@ describe('Article API', () => {
     });
 
     it('Should return 200 HTTP status and test message', async () => {
-        await request(app).get('/').expect(200, 'TEST MESSAGE');
+        await request(app).get('/').expect(200, '"TEST MESSAGE"');
     });
 
     it('Should return 200 HTTP status and db in JSON ', async () => {
