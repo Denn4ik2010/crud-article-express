@@ -12,7 +12,7 @@ import { ArticleViewModel } from './models/ArticleViewModel';
 import { CreateArticleModel } from './models/CreateArticleModel';
 import { UpdateArticleModel } from './models/UpdateArticleModel';
 import { GetArticleQueryModel } from './models/GetArticleQueryModel';
-import { UriParamsIdArticleModel } from './models/UrlParamsIdArticleModel';
+import { ParamArticleIdModel } from './models/UriParamArticleIdModel';
 
 export const app: Express = express();
 const PORT: number =  3000;
@@ -60,7 +60,7 @@ app.get(
 app.get(
     '/articles/:id',
     async (
-        req: ParamsRequest<UriParamsIdArticleModel>,
+        req: ParamsRequest<ParamArticleIdModel>,
         res: Response<ArticleViewModel>
     ) => {
         const findedArticle: ArticleOrNone = db.articles.find(
@@ -97,7 +97,7 @@ app.post(
 app.put(
     '/articles/:id',
     async (
-        req: BodyParamsRequest<UpdateArticleModel, UriParamsIdArticleModel>,
+        req: BodyParamsRequest<UpdateArticleModel, ParamArticleIdModel>,
         res: Response<ArticleViewModel>
     ) => {
         const id: number = +req.params.id;
@@ -123,7 +123,7 @@ app.put(
 app.delete(
     '/articles/:id',
     async (
-        req: ParamsRequest<UriParamsIdArticleModel>,
+        req: ParamsRequest<ParamArticleIdModel>,
         res: Response
     ) => {
         const id: number = +req.params.id;
