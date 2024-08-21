@@ -1,4 +1,4 @@
-import { Response, Router } from 'express';
+import { Request, Response, Router } from 'express';
 import {
     QueryRequest,
     BodyParamsRequest,
@@ -17,7 +17,6 @@ import { getUniqueId } from '../utils/unique_id';
 import db from '../db/db';
 
 export const articleRouter: Router = Router();
-
 articleRouter.get(
     '/',
     async (
@@ -26,13 +25,34 @@ articleRouter.get(
     ) => {
         let foundedArticles: Article[] = db.articles;
 
-        if (req.query.title) {
+        if (req.query.title && req.query.author) {
+            // Articles filtered by author
+            foundedArticles = foundedArticles.filter(
+                (a) => a.author.indexOf(req.query.author) > -1
+            );
+
+            // Articles filtered by title
             foundedArticles = foundedArticles.filter(
                 (a) => a.title.indexOf(req.query.title) > -1
             );
-        }
 
-        return res.status(200).json(foundedArticles);
+            res.status(200).json(foundedArticles);
+        } else if (req.query.author) {
+            foundedArticles = foundedArticles.filter(
+                (a) => a.author.indexOf(req.query.author) > -1
+            );
+
+            res.status(200).json(foundedArticles);
+        } else if (req.query.title) {
+            foundedArticles = foundedArticles.filter(
+                (a) => a.title.indexOf(req.query.title) > -1
+            );
+
+            res.status(200).json(foundedArticles);
+        } else {
+            // Send response only once
+            res.status(200).json(foundedArticles);
+        }
     }
 );
 

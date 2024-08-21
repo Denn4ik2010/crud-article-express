@@ -1,8 +1,8 @@
 import request from 'supertest';
 import app from '../../src/app/app';
 import { Article } from '../../src/app/types/article-types';
-import { CreateArticleModel } from "../../src/app/models/create-article.model";
-import {UpdateArticleModel} from "../../src/app/models/update-article.model"
+import { CreateArticleModel as CreateArticleModel } from '../../src/app/models/create-article.model';
+import { UpdateArticleModel } from '../../src/app/models/update-article.model';
 
 describe('Article API', () => {
     beforeAll(async () => {
@@ -24,21 +24,22 @@ describe('Article API', () => {
     let article: Article;
 
     it('Should return 201 HTTP status and created article', async () => {
-        const data: CreateArticleModel = {
+        const data1: CreateArticleModel = {
             title: 'Test title',
             author: 'Test author',
             text: 'Test text',
         };
+
         const createResponse = await request(app)
             .post('/articles')
-            .send(data)
+            .send(data1)
             .expect(201);
 
         article = createResponse.body;
 
         expect(article).toEqual({
             id: expect.any(Number),
-            ...data
+            ...data1,
         });
 
         await request(app)
@@ -46,17 +47,68 @@ describe('Article API', () => {
             .expect(200, article);
     });
 
-    it('Should return 200 HTTP status and return finded article by query param' , async () => {
-        const res = await request(app).get('/articles?title=est').expect(200)
+    it('Should return 200 HTTP status and return finded article by query title', async () => {
+        const res = await request(app).get('/articles?title=est').expect(200);
 
-        expect(res.body).toEqual([{
-            id: expect.any(Number),
-            title: article.title,
-            author: article.author,
-            text: article.text,
-        }]);
-    })
+        expect(res.body).toEqual([
+            {
+                id: expect.any(Number),
+                title: article.title,
+                author: article.author,
+                text: article.text,
+            },
+        ]);
+    });
 
+    it('Should return 201 HTTP status and second created article', async () => {
+        const data2: CreateArticleModel = {
+            title: 'Test TITLE1',
+            author: 'Test AUTHOR',
+            text: 'Test TEXT',
+        };
+
+        await request(app).post('/articles').send(data2).expect(201);
+    });
+
+    it('Should return 201 HTTP status and third created article', async () => {
+        const data3: CreateArticleModel = {
+            title: 'Test title',
+            author: 'Test Author',
+            text: 'Test text',
+        };
+
+        await request(app).post('/articles').send(data3).expect(201);
+    });
+
+    it('Should return 201 HTTP status and article finded by author', async () => {
+        const res = await request(app)
+            .get('/articles?author=Author')
+            .expect(200);
+
+        expect(res.body).toEqual([
+            {
+                id: expect.any(Number),
+                title: 'Test title',
+                author: 'Test Author',
+                text: 'Test text',
+            },
+        ]);
+    });
+
+    it('Should return 201 HTTP status and article finded by title and author', async () => {
+        const res = await request(app)
+            .get('/articles?author=AUTHOR&title=est')
+            .expect(200);
+
+        expect(res.body).toEqual([
+            {
+                id: expect.any(Number),
+                title: 'Test TITLE1',
+                author: 'Test AUTHOR',
+                text: 'Test TEXT',
+            },
+        ]);
+    });
 
     it('Should return 200 HTTP status and updated article', async () => {
         const data: UpdateArticleModel = {
@@ -76,7 +128,7 @@ describe('Article API', () => {
         expect(updatedArticle).toEqual({
             id: article.id,
             author: article.author,
-            ...data
+            ...data,
         });
     });
 
