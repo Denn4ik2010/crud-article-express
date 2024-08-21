@@ -23,38 +23,26 @@ articleRouter.get(
         req: QueryRequest<ArticleQueryModel>,
         res: Response<ArticleViewModel[]>
     ) => {
+        const { title, author } = req.query;
+
         let foundedArticles: Article[] = db.articles;
 
-        if (req.query.title && req.query.author) {
-            // Articles filtered by author
+        if (author) {
             foundedArticles = foundedArticles.filter(
-                (a) => a.author.indexOf(req.query.author) > -1
+                (a) => a.author.indexOf(author) > -1
             );
-
-            // Articles filtered by title
-            foundedArticles = foundedArticles.filter(
-                (a) => a.title.indexOf(req.query.title) > -1
-            );
-
-            res.status(200).json(foundedArticles);
-        } else if (req.query.author) {
-            foundedArticles = foundedArticles.filter(
-                (a) => a.author.indexOf(req.query.author) > -1
-            );
-
-            res.status(200).json(foundedArticles);
-        } else if (req.query.title) {
-            foundedArticles = foundedArticles.filter(
-                (a) => a.title.indexOf(req.query.title) > -1
-            );
-
-            res.status(200).json(foundedArticles);
-        } else {
-            // Send response only once
-            res.status(200).json(foundedArticles);
         }
+
+        if (title) {
+            foundedArticles = foundedArticles.filter(
+                (a) => a.title.indexOf(title) > -1
+            );
+        }
+
+        return res.status(200).json(foundedArticles);
     }
 );
+
 
 articleRouter.get(
     '/:id',
