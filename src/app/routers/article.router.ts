@@ -1,88 +1,100 @@
-import { Request, Response, Router } from 'express';
+import { Response, Router } from 'express';
 import {
     QueryRequest,
     BodyParamsRequest,
     ParamsRequest,
     BodyRequest,
-} from '../types/request-types';
-import { Article } from '../types/article-types';
-import { ArticleOrNone } from '../types/article-types';
+} from '../types/request.types';
+import { Article } from '../types/article.types';
+import { ArticleOrNone } from '../types/article.types';
 
 import { ArticleViewModel } from '../models/article-view.model';
 import { ParamArticleIdModel } from '../models/uri-param-id.model';
 import { ArticleQueryModel } from '../models/get-article-query.model';
 import { CreateArticleModel } from '../models/create-article.model';
 import { UpdateArticleModel } from '../models/update-article.model';
-import { getUniqueId } from '../utils/unique_id';
-import db from '../db/db';
+import { ProductRepository } from '../repository/article.repository';
+
+import {
+    idValidator,
+    queryAuthorValidator,
+    queryTitleValidator,
+    textValidator,
+    authorValidator,
+    titleValidator,
+    validationResultMiddleware,
+} from '../middleware/input-validation.middware';
 
 export const articleRouter: Router = Router();
+
 articleRouter.get(
     '/',
+    queryTitleValidator,
+    queryAuthorValidator,
+    validationResultMiddleware,
     async (
         req: QueryRequest<ArticleQueryModel>,
         res: Response<ArticleViewModel[]>
     ) => {
         const { title, author } = req.query;
 
-        let foundedArticles: Article[] = db.articles;
+        const findedArticles: Article[] = ProductRepository.findArticles(
+            title,
+            author
+        );
 
-        if (author) {
-            foundedArticles = foundedArticles.filter(
-                (a) => a.author.indexOf(author) > -1
-            );
-        }
-
-        if (title) {
-            foundedArticles = foundedArticles.filter(
-                (a) => a.title.indexOf(title) > -1
-            );
-        }
-
-        return res.status(200).json(foundedArticles);
+        res.status(200).json(findedArticles);
     }
 );
 
-
 articleRouter.get(
     '/:id',
+    idValidator,
+    validationResultMiddleware,
     async (
         req: ParamsRequest<ParamArticleIdModel>,
         res: Response<ArticleViewModel>
     ) => {
-        const findedArticle: ArticleOrNone = db.articles.find(
-            (val) => val.id === +req.params.id
+        const findedArticle: ArticleOrNone = ProductRepository.findArticleById(
+            +req.params.id
         );
 
         if (!findedArticle) {
-            return res.sendStatus(404);
+            res.sendStatus(404);
         } else {
-            return res.status(200).json(findedArticle);
+            res.status(200).json(findedArticle);
         }
     }
 );
 
 articleRouter.post(
     '/',
+    titleValidator,
+    textValidator,
+    authorValidator,
+    validationResultMiddleware,
     async (
         req: BodyRequest<CreateArticleModel>,
         res: Response<ArticleViewModel>
     ) => {
         const { title, text, author } = req.body;
 
-        if (title && author && text) {
-            const article: Article = { id: getUniqueId(), title, text, author };
-            db.articles.push(article);
+        const createdArticle = ProductRepository.createArticle(
+            title,
+            text,
+            author
+        );
 
-            return res.status(201).json(article);
-        } else {
-            return res.sendStatus(400);
-        }
+        res.status(201).json(createdArticle);
     }
 );
 
 articleRouter.put(
     '/:id',
+    idValidator,
+    titleValidator,
+    textValidator,
+    // validationResultMiddleware,
     async (
         req: BodyParamsRequest<UpdateArticleModel, ParamArticleIdModel>,
         res: Response<ArticleViewModel>
@@ -90,37 +102,30 @@ articleRouter.put(
         const id: number = +req.params.id;
         const { title, text } = req.body;
 
-        if (!text || !title) {
-            return res.sendStatus(400);
-        }
+        const updatedArticle = ProductRepository.updateArticle(id, title, text);
 
-        const article: ArticleOrNone = db.articles.find((val) => val.id === id);
-
-        if (article) {
-            article.title = title;
-            article.text = text;
-
-            return res.status(200).json(article);
+        if (updatedArticle) {
+            res.status(200).json(updatedArticle);
         } else {
-            return res.sendStatus(404);
+            res.sendStatus(400);
         }
     }
 );
 
 articleRouter.delete(
     '/:id',
+    idValidator,
+    validationResultMiddleware,
     async (req: ParamsRequest<ParamArticleIdModel>, res: Response) => {
         const id: number = +req.params.id;
 
-        const articleIndex: number = db.articles.findIndex(
-            (val) => val.id === id
-        );
+        const deletedArticleStatus: number =
+            ProductRepository.deleteArticle(id);
 
-        if (articleIndex !== -1) {
-            db.articles.splice(articleIndex, 1);
-            return res.sendStatus(204);
+        if (deletedArticleStatus === 204) {
+            res.sendStatus(204);
         } else {
-            return res.sendStatus(404);
+            res.sendStatus(404);
         }
     }
 );

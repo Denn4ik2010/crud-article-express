@@ -2,7 +2,6 @@ import express, { Request, Express, Response } from 'express';
 import morgan from 'morgan';
 import { articleRouter } from './routers/article.router';
 import testsRouter from './routers/test.router';
-
 const app: Express = express();
 
 app.use(
@@ -10,6 +9,7 @@ app.use(
         'INFO:    :method :url HTTP/:http-version :status  :response-time ms'
     )
 );
+
 app.use(express.json());
 app.use('/articles', articleRouter);
 app.use('/__test__', testsRouter);

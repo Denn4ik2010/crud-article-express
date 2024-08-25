@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import db from '../db/db';
+import { db } from '../repository/article.repository';
 
 const testsRouter: Router = Router();
 
