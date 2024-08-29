@@ -15,7 +15,7 @@ export let db: Db = {
 };
 
 export class ProductRepository {
-    static findArticles(title?: string, author?: string): Article[] {
+    static async findArticles(title?: string, author?: string): Promise<Article[]> {
         let foundedArticles: Article[] = db.articles;
 
         if (author) {
@@ -33,14 +33,14 @@ export class ProductRepository {
         return foundedArticles;
     }
 
-    static findArticleById(id: number): ArticleOrNone {
+    static async findArticleById(id: number): Promise<ArticleOrNone> {
         let foundedArticle: ArticleOrNone =
             db.articles.find((a) => a.id === id) || null;
 
         return foundedArticle;
     }
 
-    static createArticle(title: string, text: string, author: string): Article {
+    static async createArticle(title: string, text: string, author: string): Promise<Article> {
         const createdArticle: Article = {
             id: getUniqueId(),
             title,
@@ -53,11 +53,11 @@ export class ProductRepository {
         return createdArticle;
     }
 
-    static updateArticle(
+    static async updateArticle(
         id: number,
         title: string,
         text: string
-    ): ArticleOrNone {
+    ): Promise<ArticleOrNone> {
         const foundedArticle: ArticleOrNone = db.articles.find(
             (a) => a.id === id
         );
@@ -75,7 +75,7 @@ export class ProductRepository {
     /**
      * @return HTTP status code
      */
-    static deleteArticle(id: number): number {
+    static async deleteArticle(id: number): Promise<number> {
         const articleIndex = db.articles.findIndex((a) => a.id === id);
 
         if (articleIndex !== -1) {

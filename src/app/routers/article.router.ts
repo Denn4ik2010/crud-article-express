@@ -23,22 +23,22 @@ import {
     authorValidator,
     titleValidator,
     validationResultMiddleware,
-} from '../middleware/input-validation.middware';
+} from '../middleware/input-validation.middlware';
 
 export const articleRouter: Router = Router();
+articleRouter.use(validationResultMiddleware)
 
 articleRouter.get(
     '/',
     queryTitleValidator,
     queryAuthorValidator,
-    validationResultMiddleware,
     async (
         req: QueryRequest<ArticleQueryModel>,
         res: Response<ArticleViewModel[]>
     ): Promise<void> => {
         const { title, author } = req.query;
 
-        const findedArticles: Article[] = ProductRepository.findArticles(
+        const findedArticles: Article[] = await ProductRepository.findArticles(
             title,
             author
         );
@@ -50,14 +50,12 @@ articleRouter.get(
 articleRouter.get(
     '/:id',
     idValidator,
-    validationResultMiddleware,
     async (
         req: ParamsRequest<ParamArticleIdModel>,
         res: Response<ArticleViewModel>
     ): Promise<void> => {
-        const findedArticle: ArticleOrNone = ProductRepository.findArticleById(
-            +req.params.id
-        );
+        const findedArticle: ArticleOrNone =
+            await ProductRepository.findArticleById(+req.params.id);
 
         if (!findedArticle) {
             res.sendStatus(404);
@@ -72,14 +70,13 @@ articleRouter.post(
     titleValidator,
     textValidator,
     authorValidator,
-    validationResultMiddleware,
     async (
         req: BodyRequest<CreateArticleModel>,
         res: Response<ArticleViewModel>
     ): Promise<void> => {
         const { title, text, author } = req.body;
 
-        const createdArticle = ProductRepository.createArticle(
+        const createdArticle = await ProductRepository.createArticle(
             title,
             text,
             author
@@ -94,7 +91,6 @@ articleRouter.put(
     idValidator,
     titleValidator,
     textValidator,
-    validationResultMiddleware,
     async (
         req: BodyParamsRequest<UpdateArticleModel, ParamArticleIdModel>,
         res: Response<ArticleViewModel>
@@ -102,7 +98,11 @@ articleRouter.put(
         const id: number = +req.params.id;
         const { title, text } = req.body;
 
-        const updatedArticle = ProductRepository.updateArticle(id, title, text);
+        const updatedArticle = await ProductRepository.updateArticle(
+            id,
+            title,
+            text
+        );
 
         if (updatedArticle) {
             res.status(200).json(updatedArticle);
@@ -115,7 +115,6 @@ articleRouter.put(
 articleRouter.delete(
     '/:id',
     idValidator,
-    validationResultMiddleware,
     async (
         req: ParamsRequest<ParamArticleIdModel>,
         res: Response
@@ -123,7 +122,7 @@ articleRouter.delete(
         const id: number = +req.params.id;
 
         const deletedArticleStatus: number =
-            ProductRepository.deleteArticle(id);
+            await ProductRepository.deleteArticle(id);
 
         if (deletedArticleStatus === 204) {
             res.sendStatus(204);
