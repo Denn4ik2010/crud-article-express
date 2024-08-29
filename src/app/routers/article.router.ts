@@ -35,7 +35,7 @@ articleRouter.get(
     async (
         req: QueryRequest<ArticleQueryModel>,
         res: Response<ArticleViewModel[]>
-    ) => {
+    ): Promise<void> => {
         const { title, author } = req.query;
 
         const findedArticles: Article[] = ProductRepository.findArticles(
@@ -54,7 +54,7 @@ articleRouter.get(
     async (
         req: ParamsRequest<ParamArticleIdModel>,
         res: Response<ArticleViewModel>
-    ) => {
+    ): Promise<void> => {
         const findedArticle: ArticleOrNone = ProductRepository.findArticleById(
             +req.params.id
         );
@@ -76,7 +76,7 @@ articleRouter.post(
     async (
         req: BodyRequest<CreateArticleModel>,
         res: Response<ArticleViewModel>
-    ) => {
+    ): Promise<void> => {
         const { title, text, author } = req.body;
 
         const createdArticle = ProductRepository.createArticle(
@@ -94,11 +94,11 @@ articleRouter.put(
     idValidator,
     titleValidator,
     textValidator,
-    // validationResultMiddleware,
+    validationResultMiddleware,
     async (
         req: BodyParamsRequest<UpdateArticleModel, ParamArticleIdModel>,
         res: Response<ArticleViewModel>
-    ) => {
+    ): Promise<void> => {
         const id: number = +req.params.id;
         const { title, text } = req.body;
 
@@ -116,7 +116,10 @@ articleRouter.delete(
     '/:id',
     idValidator,
     validationResultMiddleware,
-    async (req: ParamsRequest<ParamArticleIdModel>, res: Response) => {
+    async (
+        req: ParamsRequest<ParamArticleIdModel>,
+        res: Response
+    ): Promise<void> => {
         const id: number = +req.params.id;
 
         const deletedArticleStatus: number =

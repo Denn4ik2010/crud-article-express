@@ -2,5 +2,5 @@ export type ParamArticleIdModel = {
     /**
      * Id of Article
      */
-    id: string;
+    readonly id: string;
 };

@@ -3,9 +3,9 @@ import { db } from '../repository/article.repository';
 
 const testsRouter: Router = Router();
 
-testsRouter.delete('/data', (req: Request, res: Response<string>) => {
+testsRouter.delete('/data', async (req: Request, res: Response<string>): Promise<void> => {
     db.articles = [];
-    return res.status(204).json('DB nulled sucessfully');
+    res.status(204).json('DB nulled sucessfully');
 });
 
 export default testsRouter;

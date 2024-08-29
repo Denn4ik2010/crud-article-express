@@ -6,15 +6,15 @@ export type CreateArticleModel = {
     /**
      * Title of the article.
      */
-    title: string;
+    readonly title: string;
 
     /**
      * Full text of the article.
      */
-    text: string;
+    readonly text: string;
 
     /**
      * Author of the article.
      */
-    author: string;
+    readonly author: string;
 };

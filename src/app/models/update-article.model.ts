@@ -6,10 +6,10 @@ export type UpdateArticleModel = {
     /**
      * (Optional) Title of the article.
      */
-    title: string;
+    readonly title: string;
 
     /**
      * (Optional) Full text of the article.
      */
-    text: string;
+    readonly text: string;
 };

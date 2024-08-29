@@ -6,10 +6,10 @@ export type ArticleQueryModel = {
     /**
      * (Optional) Filter articles by author.
      */
-    author: string;
+    author?: string;
 
     /**
      * (Optional) Search articles by title.
      */
-    title: string;
+    title?: string;
 };
