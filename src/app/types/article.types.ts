@@ -1,11 +1,12 @@
-export interface Article {
-    readonly id: number;
+import { WithId } from "mongodb";
+
+export interface IArticle {
     title: string;
     text: string;
     author: string;
+    readonly date: Date;
 }
 
-type Nullable<T> = T | null | undefined;
+export type Article = WithId<IArticle>
 
-export type ArticleOrNone = Nullable<Article>;
-export type Db = { articles: Article[] };
+type Nullable<T> = T | null | undefined;

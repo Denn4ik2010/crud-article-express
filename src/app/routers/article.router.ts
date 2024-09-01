@@ -1,49 +1,50 @@
 import { Response, Router } from 'express';
+import { IArticle } from '../types/article.types';
+import { ArticleService } from '../services/article.service';
 import {
-    QueryRequest,
     BodyParamsRequest,
-    ParamsRequest,
     BodyRequest,
+    ParamsRequest,
+    QueryRequest,
 } from '../types/request.types';
-import { Article } from '../types/article.types';
-import { ArticleOrNone } from '../types/article.types';
-
-import { ArticleViewModel } from '../models/article-view.model';
-import { ParamArticleIdModel } from '../models/uri-param-id.model';
-import { ArticleQueryModel } from '../models/get-article-query.model';
-import { CreateArticleModel } from '../models/create-article.model';
-import { UpdateArticleModel } from '../models/update-article.model';
-import { ProductRepository } from '../repository/article.repository';
-
 import {
+    validationResultMiddleware,
     idValidator,
     queryAuthorValidator,
     queryTitleValidator,
-    textValidator,
     authorValidator,
     titleValidator,
-    validationResultMiddleware,
+    textValidator,
+    dateValidator,
 } from '../middleware/input-validation.middlware';
+import ArticleQueryModel from '../models/get-article-query.model';
+import ParamArticleIdModel from '../models/uri-param-id.model';
+import CreateArticleDto from '../dto/create-article.dto';
+import UpdateArticleDto from '../dto/update-article.dto';
+import {
+    ArticleViewModel,
+    ArticlesViewModel,
+    ArticleInsertResult,
+    ArticleUpdateResult,
+    ArticleDeleteResult,
+} from '../models/articles-views.model';
 
-export const articleRouter: Router = Router();
-articleRouter.use(validationResultMiddleware)
+const articleRouter: Router = Router();
+articleRouter.use(validationResultMiddleware);
 
 articleRouter.get(
     '/',
-    queryTitleValidator,
     queryAuthorValidator,
+    queryTitleValidator,
     async (
         req: QueryRequest<ArticleQueryModel>,
-        res: Response<ArticleViewModel[]>
+        res: Response<ArticlesViewModel>
     ): Promise<void> => {
-        const { title, author } = req.query;
-
-        const findedArticles: Article[] = await ProductRepository.findArticles(
-            title,
-            author
+        const articles = await ArticleService.findArticles(
+            req.query.title,
+            req.query.author
         );
-
-        res.status(200).json(findedArticles);
+        res.json(articles);
     }
 );
 
@@ -54,13 +55,11 @@ articleRouter.get(
         req: ParamsRequest<ParamArticleIdModel>,
         res: Response<ArticleViewModel>
     ): Promise<void> => {
-        const findedArticle: ArticleOrNone =
-            await ProductRepository.findArticleById(+req.params.id);
-
-        if (!findedArticle) {
-            res.sendStatus(404);
+        const article = await ArticleService.findArticleById(req.params.id);
+        if (!article) {
+            res.status(404).json({ message: 'Article not found' });
         } else {
-            res.status(200).json(findedArticle);
+            res.json(article);
         }
     }
 );
@@ -68,46 +67,39 @@ articleRouter.get(
 articleRouter.post(
     '/',
     titleValidator,
-    textValidator,
     authorValidator,
+    textValidator,
+    dateValidator,
     async (
-        req: BodyRequest<CreateArticleModel>,
-        res: Response<ArticleViewModel>
+        req: BodyRequest<CreateArticleDto>,
+        res: Response<ArticleInsertResult>
     ): Promise<void> => {
-        const { title, text, author } = req.body;
+        const createArticleDto: CreateArticleDto = req.body
 
-        const createdArticle = await ProductRepository.createArticle(
-            title,
-            text,
-            author
-        );
-
-        res.status(201).json(createdArticle);
+        const newArticle = await ArticleService.createArticle(createArticleDto);
+        res.status(201).json(newArticle);
     }
 );
 
 articleRouter.put(
     '/:id',
     idValidator,
-    titleValidator,
     textValidator,
+    titleValidator,
     async (
-        req: BodyParamsRequest<UpdateArticleModel, ParamArticleIdModel>,
-        res: Response<ArticleViewModel>
+        req: BodyParamsRequest<UpdateArticleDto, ParamArticleIdModel>,
+        res: Response<ArticleUpdateResult>
     ): Promise<void> => {
-        const id: number = +req.params.id;
-        const { title, text } = req.body;
+        const updateArticleDto: UpdateArticleDto = req.body;
 
-        const updatedArticle = await ProductRepository.updateArticle(
-            id,
-            title,
-            text
+        const updatedArticle = await ArticleService.updateArticle(
+            req.params.id,
+            updateArticleDto
         );
-
-        if (updatedArticle) {
-            res.status(200).json(updatedArticle);
+        if (!updatedArticle) {
+            res.status(404).json({ message: 'Article not found' });
         } else {
-            res.sendStatus(400);
+            res.json(updatedArticle);
         }
     }
 );
@@ -117,17 +109,17 @@ articleRouter.delete(
     idValidator,
     async (
         req: ParamsRequest<ParamArticleIdModel>,
-        res: Response
+        res: Response<ArticleDeleteResult>
     ): Promise<void> => {
-        const id: number = +req.params.id;
-
-        const deletedArticleStatus: number =
-            await ProductRepository.deleteArticle(id);
-
-        if (deletedArticleStatus === 204) {
-            res.sendStatus(204);
+        const deletedArticle = await ArticleService.deleteArticle(
+            req.params.id
+        );
+        if (!(deletedArticle.deletedCount === 1)) {
+            res.status(404).json({ message: 'Article not found' });
         } else {
-            res.sendStatus(404);
+            res.json({ message: 'Article deleted' });
         }
     }
 );
+
+export default articleRouter;

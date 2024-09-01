@@ -2,7 +2,7 @@
  * Represents the model for creating a new article.
  * Used for POST request.
  */
-export type CreateArticleModel = {
+type CreateArticleDto = {
     /**
      * Title of the article.
      */
@@ -16,5 +16,11 @@ export type CreateArticleModel = {
     /**
      * Author of the article.
      */
-    readonly author: string;
+    readonly author: string
+    /**
+     * The date of publication
+     */
+    readonly date: Date;
 };
+
+export default CreateArticleDto;

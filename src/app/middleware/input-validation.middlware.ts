@@ -9,11 +9,7 @@ import {
 import { Request, Response, NextFunction } from 'express';
 
 export const idValidator = param('id')
-    .exists({ checkFalsy: true })
-    .withMessage('Id is required')
-    .isInt({ min: 1 })
-    .withMessage('Id must be a positive integer')
-    .toInt()
+    .isUUID()
     .escape();
 
 export const queryTitleValidator = query('title')
@@ -36,21 +32,24 @@ export const queryAuthorValidator = query('author')
 
 export const titleValidator = body('title')
     .trim()
-    .isLength({ min: 4, max: 50 })
+    .isLength({ min: 1, max: 50 }) // TODO: replace min to 5
     .withMessage('Title length must be from 4 to 50 characters')
     .escape();
 
 export const textValidator = body('text')
     .trim()
-    .isLength({ min: 5, max: 350 }) // TODO - replace min lenght to 25
+    .isLength({ min: 1, max: 1000 }) // TODO: replace min lenght to 25
     .withMessage('Text length must be between 25 and 350 characters')
     .escape();
 
 export const authorValidator = body('author')
     .trim()
-    .isLength({ min: 5, max: 20 })
+    .isLength({ min: 1, max: 20 }) // TODO: replace min to 4
     .withMessage('Author length must be between 5 and 20 characters')
     .escape();
+
+export const dateValidator = body('date').isDate().escape()
+
 
 export const validationResultMiddleware = async (
     req: Request,

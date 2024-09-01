@@ -6,7 +6,9 @@
     "dependencies": {
         "dotenv": "^16.4.5",
         "express": "^4.19.2",
-        "express-validator": "^7.2.0"
+        "express-validator": "^7.2.0",
+        "mongodb": "^6.8.0",
+        "mongoose": "^8.6.0"
     },
     "scripts": {
         "watch": "tsc -w",

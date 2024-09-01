@@ -2,7 +2,7 @@
  * Represents the model for updating an existing article.
  * Used for PUT request.
  */
-export type UpdateArticleModel = {
+type UpdateArticleDto = {
     /**
      * (Optional) Title of the article.
      */
@@ -13,3 +13,5 @@ export type UpdateArticleModel = {
      */
     readonly text: string;
 };
+
+export default UpdateArticleDto;

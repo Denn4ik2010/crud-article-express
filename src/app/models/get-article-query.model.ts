@@ -2,7 +2,7 @@
  * Represents the query model for fetching articles.
  * Can be used to filter articles based on various criteria.
  */
-export type ArticleQueryModel = {
+type ArticleQueryModel = {
     /**
      * (Optional) Filter articles by author.
      */
@@ -13,3 +13,4 @@ export type ArticleQueryModel = {
      */
     title?: string;
 };
+export default ArticleQueryModel;
