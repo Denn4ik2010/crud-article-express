@@ -1,3 +1,3 @@
-import {runApp} from './app/app'
+import { runApp } from './app/app';
 
-runApp()
+runApp();

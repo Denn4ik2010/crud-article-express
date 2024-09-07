@@ -24,7 +24,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 export async function runApp() {
-    await runDb()
+    await runDb();
     app.listen(PORT, () => {
         console.log(`INFO:    Server started at http://localhost:${PORT}`);
     });

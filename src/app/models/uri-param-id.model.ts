@@ -5,4 +5,4 @@ type ParamArticleIdModel = {
     readonly id: string;
 };
 
-export default ParamArticleIdModel
+export default ParamArticleIdModel;

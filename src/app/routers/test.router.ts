@@ -1,6 +1,5 @@
-import { Router , Request , Response } from "express";
-import { collection, runDb } from '../db/db'
-
+import { Router, Request, Response } from 'express';
+import { collection, runDb } from '../db/db';
 
 const testRouter: Router = Router();
 testRouter.delete(

@@ -4,12 +4,12 @@
  */
 type UpdateArticleDto = {
     /**
-     * (Optional) Title of the article.
+     * Title of the article.
      */
     readonly title: string;
 
     /**
-     * (Optional) Full text of the article.
+     * Full text of the article.
      */
     readonly text: string;
 };

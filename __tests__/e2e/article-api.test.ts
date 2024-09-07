@@ -15,7 +15,7 @@ describe('Article RESTFull API tests', () => {
         const createDto = {
             title: 'wegdsgs',
             author: 'dsiiii',
-            text: '123456789012345678901',
+            text: 'aaaaaaaaaaaa',
         };
 
         const res = await request(app)
@@ -37,7 +37,7 @@ describe('Article RESTFull API tests', () => {
                 _id: articleId,
                 title: 'wegdsgs',
                 author: 'dsiiii',
-                text: '123456789012345678901',
+                text: 'aaaaaaaaaaaa',
                 date: expect.any(String),
             },
         ]);
@@ -51,21 +51,23 @@ describe('Article RESTFull API tests', () => {
                 _id: articleId,
                 title: 'wegdsgs',
                 author: 'dsiiii',
-                text: '123456789012345678901',
+                text: 'aaaaaaaaaaaa',
                 date: expect.any(String),
             },
         ]);
     });
 
     it('Should return article finded by author', async () => {
-        const res = await request(app).get('/articles?author=dsiiii').expect(200);
+        const res = await request(app)
+            .get('/articles?author=dsiiii')
+            .expect(200);
 
         expect(res.body).toEqual([
             {
                 _id: articleId,
                 title: 'wegdsgs',
                 author: 'dsiiii',
-                text: '123456789012345678901',
+                text: 'aaaaaaaaaaaa',
                 date: expect.any(String),
             },
         ]);
@@ -81,7 +83,7 @@ describe('Article RESTFull API tests', () => {
                 _id: articleId,
                 title: 'wegdsgs',
                 author: 'dsiiii',
-                text: '123456789012345678901',
+                text: 'aaaaaaaaaaaa',
                 date: expect.any(String),
             },
         ]);
@@ -96,7 +98,7 @@ describe('Article RESTFull API tests', () => {
             _id: articleId,
             title: 'wegdsgs',
             author: 'dsiiii',
-            text: '123456789012345678901',
+            text: 'aaaaaaaaaaaa',
             date: expect.any(String),
         });
     });
@@ -104,7 +106,7 @@ describe('Article RESTFull API tests', () => {
     it('Should return 200 code and update article', async () => {
         const updateDto = {
             title: 'title',
-            text: 'text',
+            text: 'text12345678',
         };
         await request(app)
             .put('/articles/' + articleId)

@@ -12,5 +12,15 @@ type ArticleQueryModel = {
      * (Optional) Search articles by title.
      */
     title?: string;
+
+    /**
+     * (Optional) Limit the number of articles returned (default: 10).
+     */
+    limit?: number;
+
+    /**
+     * (Optional) Page number (default: 1).
+     */
+    page?: number;
 };
 export default ArticleQueryModel;

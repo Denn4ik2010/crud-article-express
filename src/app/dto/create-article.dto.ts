@@ -16,11 +16,7 @@ type CreateArticleDto = {
     /**
      * Author of the article.
      */
-    readonly author: string
-    /**
-     * The date of publication
-     */
-    readonly date: Date;
+    readonly author: string;
 };
 
 export default CreateArticleDto;

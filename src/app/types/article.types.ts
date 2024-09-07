@@ -1,12 +1,12 @@
-import { WithId } from "mongodb";
+import { WithId } from 'mongodb';
 
 export interface IArticle {
     title: string;
     text: string;
-    author: string;
+    readonly author: string;
     readonly date: Date;
 }
 
-export type Article = WithId<IArticle>
-
+export type Article = WithId<IArticle>;
+export type ArticleOrNone = Nullable<Article>
 type Nullable<T> = T | null | undefined;
