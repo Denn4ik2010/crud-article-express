@@ -3,7 +3,7 @@ import app from '../../src/app/app';
 
 describe('Article RESTFull API tests', () => {
     beforeAll(async () => {
-        await request(app).delete('/__tests__/deleteAll');
+        await request(app).delete('/__tests__/deleteAllArticles');
     });
 
     it('Should return 200 code and test message', async () => {
@@ -22,10 +22,12 @@ describe('Article RESTFull API tests', () => {
             .post('/articles')
             .send(createDto)
             .expect(201);
-        articleId = res.body.insertedId;
+        articleId = res.body._id;
         expect(res.body).toEqual({
-            acknowledged: true,
-            insertedId: expect.any(String),
+            __v:0,
+            _id: expect.any(String),
+            date: expect.any(String),
+            ...createDto
         });
     });
 
@@ -34,6 +36,7 @@ describe('Article RESTFull API tests', () => {
 
         expect(res.body).toEqual([
             {
+                __v: 0,
                 _id: articleId,
                 title: 'wegdsgs',
                 author: 'dsiiii',
@@ -48,6 +51,7 @@ describe('Article RESTFull API tests', () => {
 
         expect(res.body).toEqual([
             {
+                __v: 0,
                 _id: articleId,
                 title: 'wegdsgs',
                 author: 'dsiiii',
@@ -64,6 +68,7 @@ describe('Article RESTFull API tests', () => {
 
         expect(res.body).toEqual([
             {
+                __v:0,
                 _id: articleId,
                 title: 'wegdsgs',
                 author: 'dsiiii',
@@ -80,6 +85,7 @@ describe('Article RESTFull API tests', () => {
 
         expect(res.body).toEqual([
             {
+                __v: 0,
                 _id: articleId,
                 title: 'wegdsgs',
                 author: 'dsiiii',
@@ -95,6 +101,7 @@ describe('Article RESTFull API tests', () => {
             .expect(200);
 
         expect(res.body).toEqual({
+            __v: 0,
             _id: articleId,
             title: 'wegdsgs',
             author: 'dsiiii',
@@ -116,6 +123,7 @@ describe('Article RESTFull API tests', () => {
         const res = await request(app).get('/articles/' + articleId);
 
         expect(res.body).toEqual({
+            __v: 0,
             _id: articleId,
             ...updateDto,
             author: 'dsiiii',

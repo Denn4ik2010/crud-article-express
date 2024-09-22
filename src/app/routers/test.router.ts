@@ -1,21 +1,35 @@
 import { Router, Request, Response } from 'express';
-import { collection, runDb } from '../db/db';
+import { runDb } from '../db/db';
+import ArticleModel from '../schemas/article.schema';
+import UserModel from '../schemas/user.schema';
 
 const testRouter: Router = Router();
 testRouter.delete(
-    '/deleteAll',
+    '/deleteAllArticles',
     async (req: Request, res: Response): Promise<void> => {
         try {
             await runDb();
-            const result = await collection.deleteMany({});
+            await ArticleModel.deleteMany({});
             res.status(200).json({
-                message: `Deleted ${result.deletedCount} documents.`,
+                message: 'Articles collection cleared',
             });
         } catch (error) {
-            console.error('Error deleting documents:', error);
+            console.error('Error deleting documents: ', error);
             res.status(500).json({ message: 'Error deleting documents.' });
         }
     }
 );
+
+testRouter.delete('/deleteAllUsers', async (req: Request, res: Response) => {
+    try {
+        await UserModel.deleteMany({});
+        res.status(200).json({ message: 'Users collection cleared' });
+    } catch (error) {
+        console.error('Error deleting documents: ', error);
+        res.status(500).json({
+            message: 'Error deleting documents.',
+        });
+    }
+});
 
 export default testRouter;

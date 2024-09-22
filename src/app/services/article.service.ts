@@ -1,37 +1,38 @@
-import ArticleRepository from '../repository/article-db.repository';
-import { Article, ArticleOrNone, IArticle } from '../types/article.types';
+import ArticleRepository from '../repository/article.repository';
+import { IArticle } from '../types/article.types';
 import CreateArticleDto from '../dto/create-article.dto';
 import UpdateArticleDto from '../dto/update-article.dto';
-import { DeleteResult, InsertOneResult, UpdateResult, WithId } from 'mongodb';
+import NotFoundError from '../errors/not-found.error';
 
 export class ArticleService {
     static async findArticles(
-        page?: number,
-        limit?: number,
+        page: number = 1,
+        limit: number = 10,
         title?: string,
         author?: string
-    ): Promise<Article[]> {
-        const limitValue: number = limit ?? 10;
-        const pageValue: number = page ?? 1;
-
-        const offset: number = (pageValue - 1) * limitValue;
-        const findedArticles: Article[] = await ArticleRepository.findAll(
+    ): Promise<IArticle[]> {
+        const offset: number = (page - 1) * limit;
+        const findedArticles: IArticle[] = await ArticleRepository.findAll(
             offset,
-            limitValue,
+            limit,
             title,
             author
         );
         return findedArticles;
     }
 
-    static async findArticleById(id: string): Promise<Article | null> {
-        const article: ArticleOrNone = await ArticleRepository.findById(id);
-        return article;
+    static async findArticleById(id: string): Promise<IArticle> {
+        const article: IArticle | null = await ArticleRepository.findById(id);
+        if (!article) {
+            throw new NotFoundError('Article not found');
+        } else {
+            return article;
+        }
     }
 
     static async createArticle(
         createArticleDto: CreateArticleDto
-    ): Promise<InsertOneResult<IArticle>> {
+    ): Promise<IArticle> {
         const article: IArticle = {
             title: createArticleDto.title,
             author: createArticleDto.author,
@@ -39,29 +40,31 @@ export class ArticleService {
             date: new Date(),
         };
 
-        const createdArticle: InsertOneResult<IArticle> =
-            await ArticleRepository.create(article);
+        const createdArticle: IArticle = await ArticleRepository.create(article);
         return createdArticle;
     }
 
     static async updateArticle(
         id: string,
         updateArticleDto: UpdateArticleDto
-    ): Promise<UpdateResult<IArticle>> {
+    ): Promise<IArticle | null> {
         const article: Partial<IArticle> = {
-            title: updateArticleDto.title,
-            text: updateArticleDto.text,
+            ...updateArticleDto,
         };
 
-        const updatedArticle: UpdateResult<IArticle> =
+        const updatedArticle: IArticle | null =
             await ArticleRepository.updateById(id, article);
         return updatedArticle;
     }
 
-    static async deleteArticle(id: string): Promise<DeleteResult> {
-        const deletedArticle: DeleteResult = await ArticleRepository.deleteById(
-            id
-        );
-        return deletedArticle;
+    static async deleteArticle(id: string): Promise<IArticle> {
+        const deletedArticle: IArticle | null =
+            await ArticleRepository.deleteById(id);
+
+        if (!deletedArticle) {
+            throw new NotFoundError('Article not found');
+        } else {
+            return deletedArticle;
+        }
     }
 }
