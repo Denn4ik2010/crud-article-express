@@ -2,16 +2,21 @@ import UserModel from '../schemas/user.schema';
 import UserRoleModel from '../schemas/user-role.schema';
 import { IUser } from '../types/user.types';
 
-export default class UserRepository {
-    static async findRole(value: string) {
+const userRepository = {
+    async findAllUsers(offset: number, limit: number): Promise<IUser[]> {
+        return await UserModel.find({}).skip(offset).limit(limit);
+    },
+    async findById(id: string): Promise<IUser | null> {
+        return await UserModel.findOne({ _id: id });
+    },
+
+    async findRole(value: string) {
         return await UserRoleModel.findOne({ value });
-    }
-
-    static async findByUsername(username: string): Promise<IUser | null> {
+    },
+    async findByUsername(username: string): Promise<IUser | null> {
         return await UserModel.findOne({ username });
-    }
-
-    static async create(
+    },
+    async create(
         username: string,
         password: string,
         role: string
@@ -19,9 +24,7 @@ export default class UserRepository {
         const newUser = new UserModel({ username, password, roles: [role] });
 
         return await newUser.save();
-    }
+    },
+} as const;
 
-    static async findAllUsers(): Promise<IUser[]> {
-        return await UserModel.find({});
-    }
-}
+export default userRepository;

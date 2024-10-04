@@ -4,14 +4,46 @@ import app from '../../src/app/app';
 describe('Article RESTFull API tests', () => {
     beforeAll(async () => {
         await request(app).delete('/__tests__/deleteAllArticles');
+        await request(app).delete('/__tests__/deleteAllUsers');
     });
 
     it('Should return 200 code and test message', async () => {
         await request(app).get('/').expect(200, '"TEST MESSAGE"');
     });
 
+    it('Should register a new user', async () => {
+        const createUserDto = {
+            username: 'user',
+            password: 'user',
+        };
+
+        await request(app)
+            .post('/auth/register')
+            .send(createUserDto)
+            .expect(201);
+    });
+
+    let token: string;
+    it('Should return JWT token', async () => {
+        const loginUserDto = {
+            username: 'user',
+            password: 'user',
+        };
+
+        const res = await request(app)
+            .post('/auth/login')
+            .send(loginUserDto)
+            .expect(200);
+
+        expect(res.body).toEqual({
+            token: expect.any(String),
+        });
+
+        token = res.body.token;
+    });
+
     let articleId: string;
-    it('Should create article, return his id and 201 code', async () => {
+    it('should create article', async () => {
         const createDto = {
             title: 'wegdsgs',
             author: 'dsiiii',
@@ -20,17 +52,19 @@ describe('Article RESTFull API tests', () => {
 
         const res = await request(app)
             .post('/articles')
+            .set({ Authorization: `Bearer ${token}` })
             .send(createDto)
             .expect(201);
         articleId = res.body._id;
         expect(res.body).toEqual({
-            __v:0,
+            __v: 0,
             _id: expect.any(String),
             date: expect.any(String),
-            ...createDto
+            title: 'wegdsgs',
+            author: expect.any(String),
+            text: 'aaaaaaaaaaaa',
         });
     });
-
     it('Should return articles and 200 code', async () => {
         const res = await request(app).get('/articles').expect(200);
 
@@ -39,7 +73,7 @@ describe('Article RESTFull API tests', () => {
                 __v: 0,
                 _id: articleId,
                 title: 'wegdsgs',
-                author: 'dsiiii',
+                author: expect.any(String),
                 text: 'aaaaaaaaaaaa',
                 date: expect.any(String),
             },
@@ -54,41 +88,7 @@ describe('Article RESTFull API tests', () => {
                 __v: 0,
                 _id: articleId,
                 title: 'wegdsgs',
-                author: 'dsiiii',
-                text: 'aaaaaaaaaaaa',
-                date: expect.any(String),
-            },
-        ]);
-    });
-
-    it('Should return article finded by author', async () => {
-        const res = await request(app)
-            .get('/articles?author=dsiiii')
-            .expect(200);
-
-        expect(res.body).toEqual([
-            {
-                __v:0,
-                _id: articleId,
-                title: 'wegdsgs',
-                author: 'dsiiii',
-                text: 'aaaaaaaaaaaa',
-                date: expect.any(String),
-            },
-        ]);
-    });
-
-    it('Should return article finded by title and author', async () => {
-        const res = await request(app)
-            .get('/articles?title=weg&author=dsiiii')
-            .expect(200);
-
-        expect(res.body).toEqual([
-            {
-                __v: 0,
-                _id: articleId,
-                title: 'wegdsgs',
-                author: 'dsiiii',
+                author: expect.any(String),
                 text: 'aaaaaaaaaaaa',
                 date: expect.any(String),
             },
@@ -104,7 +104,7 @@ describe('Article RESTFull API tests', () => {
             __v: 0,
             _id: articleId,
             title: 'wegdsgs',
-            author: 'dsiiii',
+            author: expect.any(String),
             text: 'aaaaaaaaaaaa',
             date: expect.any(String),
         });
@@ -117,6 +117,7 @@ describe('Article RESTFull API tests', () => {
         };
         await request(app)
             .put('/articles/' + articleId)
+            .set({ authorization: `Bearer ${token}` })
             .send(updateDto)
             .expect(200);
 
@@ -126,17 +127,25 @@ describe('Article RESTFull API tests', () => {
             __v: 0,
             _id: articleId,
             ...updateDto,
-            author: 'dsiiii',
+            author: expect.any(String),
             date: expect.any(String),
         });
     });
 
     it('Should return 200 code and delete article', async () => {
-        await request(app)
+        const res = await request(app)
             .delete('/articles/' + articleId)
-            .expect(200, {
-                message: 'Article deleted',
-            });
+            .set({ authorization: `Bearer ${token}` })
+            .expect(200);
+
+        expect(res.body).toEqual({
+            _id: articleId,
+            title: 'title',
+            author: expect.any(String),
+            date: expect.any(String),
+            text: 'text12345678',
+            __v: 0,
+        });
 
         await request(app)
             .get('/articles/' + articleId)

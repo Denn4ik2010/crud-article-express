@@ -16,7 +16,7 @@ type CreateArticleDto = {
     /**
      * Author of the article.
      */
-    readonly author: string;
+    //readonly author: string;
 };
 
 export default CreateArticleDto;

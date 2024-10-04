@@ -84,4 +84,5 @@ const validationResultMiddleware = async (
         next();
     }
 };
-export default validationResult
+
+export default validationResultMiddleware;

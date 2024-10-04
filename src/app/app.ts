@@ -5,7 +5,7 @@ import testRouter from './routers/test.router';
 import authRouter from './routers/auth.router';
 import { runDb } from './db/db';
 import { PORT } from './config/constants';
-
+import userRouter from './routers/user.router';
 
 const app: Express = express();
 
@@ -19,6 +19,7 @@ app.use(express.json());
 app.use('/__tests__', testRouter);
 app.use('/articles', articleRouter);
 app.use('/auth', authRouter);
+app.use('/users', userRouter);
 
 app.get('/', (req: Request, res: Response) => {
     res.status(200).json('TEST MESSAGE');

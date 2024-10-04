@@ -14,17 +14,18 @@ import {
 } from '../models/articles-views.model';
 import { Response } from 'express';
 import { IArticle } from '../types/article.types';
-import { ArticleService } from '../services/article.service';
+import ArticleService from '../services/article.service';
 import ParamArticleIdModel from '../models/article-id-uri-param.model';
 import NotFoundError from '../errors/not-found.error';
 import CreateArticleDto from '../dto/create-article.dto';
 import UpdateArticleDto from '../dto/update-article.dto';
+import PermissionError from '../errors/Permission.error';
 
-export default class ArticleController {
-    static async getArticles(
+const articleController = {
+    async getArticles(
         req: QueryRequest<GetArticleQueryModel>,
         res: Response<ArticlesViewModel>
-    ) {
+    ): Promise<void> {
         try {
             const articles: IArticle[] = await ArticleService.findArticles(
                 req.query.page,
@@ -37,47 +38,50 @@ export default class ArticleController {
             res.sendStatus(500);
             console.error(err);
         }
-    }
+    },
 
-    static async getArticleById(
+    async getArticleById(
         req: ParamsRequest<ParamArticleIdModel>,
         res: Response<ArticleViewModel>
-    ) {
+    ): Promise<void> {
         try {
             const article: IArticle = await ArticleService.findArticleById(
                 req.params.id
             );
             res.json(article);
         } catch (err: unknown) {
-            if( err instanceof NotFoundError){
+            if (err instanceof NotFoundError) {
                 res.status(404).json({ message: 'Article not found' });
                 console.error(err);
             } else {
                 res.sendStatus(500);
-                    console.error('Unknown error:', err);
+                console.error('Unknown error:', err);
             }
-
         }
-    }
+    },
 
-    static async createArticle(
+    async createArticle(
         req: BodyRequest<CreateArticleDto>,
         res: Response<ArticleInsertResult>
     ): Promise<void> {
         try {
             const createArticleDto: CreateArticleDto = req.body;
 
+            console.log('Creating article with data:', createArticleDto);
+
             const newArticle: IArticle = await ArticleService.createArticle(
-                createArticleDto
+                createArticleDto,
+                (req as any).user.id
             );
+
+            console.log('Article created:', newArticle);
             res.status(201).json(newArticle);
         } catch (err: unknown) {
+            console.error('Error during article creation:', err);
             res.sendStatus(500);
-            console.error(err);
         }
-    }
-
-    static async updateArticle(
+    },
+    async updateArticle(
         req: BodyParamsRequest<UpdateArticleDto, ParamArticleIdModel>,
         res: Response<ArticleUpdateResult>
     ): Promise<void> {
@@ -87,7 +91,8 @@ export default class ArticleController {
             const updatedArticle: IArticle | null =
                 await ArticleService.updateArticle(
                     req.params.id,
-                    updateArticleDto
+                    updateArticleDto,
+                    (req as any).user.id
                 );
             if (!updatedArticle) {
                 res.status(404).json({ message: 'Article not found' });
@@ -95,27 +100,38 @@ export default class ArticleController {
                 res.json(updatedArticle);
             }
         } catch (err: unknown) {
-            if (err instanceof NotFoundError) {
-                res.status(404).json({message: "Article not found"})
+            switch (true) {
+                case err instanceof NotFoundError:
+                    console.error(err);
+                    res.status(404).json({ message: 'Article not found' });
+                case err instanceof PermissionError:
+                    res.status(403).json({ message: 'unathorizaed' });
+                    console.error(err);
             }
-                res.sendStatus(500);
-                console.error(err);
         }
-    }
+    },
 
-    static async deleteArticle(
+    async deleteArticle(
         req: ParamsRequest<ParamArticleIdModel>,
         res: Response<ArticleDeleteResult>
     ): Promise<void> {
         try {
             const deletedArticle = await ArticleService.deleteArticle(
-                req.params.id
+                req.params.id,
+                (req as any).user.id
             );
-            res.json(deletedArticle);
+            res.status(200).json(deletedArticle);
         } catch (err: unknown) {
-                if (err instanceof NotFoundError){
-                    res.status(404).json({message: "Artile not found"})
-                }
+            switch (true) {
+                case err instanceof NotFoundError:
+                    console.error(err);
+                    res.status(404).json({ message: 'Artile not found' });
+                case err instanceof PermissionError:
+                    console.error(err);
+                    res.status(403).json({ message: 'unathorizaeed' });
             }
         }
-    }
+    },
+} as const;
+
+export default articleController;

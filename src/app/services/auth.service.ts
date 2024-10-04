@@ -9,14 +9,14 @@ import jwt from 'jsonwebtoken';
 
 const authService = {
     async registerUser(username: string, password: string): Promise<void> {
-        const userExists: IUser | null = await this._checkUser(username);
+        const userExists: IUser | null = await this.checkUser(username);
 
         if (userExists) {
             throw new AlreadyExistsError('User already exist');
         } else {
             const hashedPassword = bcrypt.hashSync(password, 5);
 
-            const userRole = await UserRepository.findRole("USER");
+            const userRole = await UserRepository.findRole('USER');
 
             await UserRepository.create(
                 username,
@@ -25,7 +25,7 @@ const authService = {
             );
         }
     },
-    async _checkUser(username: string): Promise<IUser | null> {
+    async checkUser(username: string): Promise<IUser | null> {
         const findedUser: IUser | null = await UserRepository.findByUsername(
             username
         );
@@ -33,8 +33,8 @@ const authService = {
         return findedUser;
     },
 
-    async login(username: string, password: string):Promise<string> {
-        const user: IUser | null = await this._checkUser(username);
+    async login(username: string, password: string): Promise<string> {
+        const user: IUser | null = await this.checkUser(username);
         if (!user) {
             throw new NotFoundError('User not found');
         } else {
@@ -45,7 +45,7 @@ const authService = {
             if (!validPassword) {
                 throw new IncorrectPasswordError('Incorrect password');
             } else {
-                const token: string = await this._generateAccessToken(
+                const token: string = await this.generateAccessToken(
                     user._id,
                     user.roles as string[]
                 );
@@ -54,17 +54,16 @@ const authService = {
         }
     },
 
-    async _generateAccessToken(id: string, roles: string[]): Promise<string> {
-        const payload = { id, roles };
+    async generateAccessToken(
+        userId: string,
+        roles: string[]
+    ): Promise<string> {
+        const payload = { userId, roles };
 
         return jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
     },
 
-    async getAllUsers(): Promise<IUser[]>{
-        return await UserRepository.findAllUsers();
-    }
-
-
-};
+    
+} as const;
 
 export default authService;

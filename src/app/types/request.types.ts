@@ -1,5 +1,6 @@
 import { Request as R } from 'express';
 
+export type EmptyRequest = R<{}, {}, {}, {}>;
 export type ParamsRequest<P> = R<P>;
 export type QueryRequest<Q> = R<{}, {}, {}, Q>;
 export type BodyRequest<B> = R<{}, {}, B>;

@@ -10,6 +10,7 @@ import validationResultMiddleware, {
     queryPageValidator,
 } from '../middleware/input-validation.middlware';
 import ArticleController from '../controllers/article.controller'
+import authMiddleware from '../middleware/auth.middleware';
 
 const articleRouter: Router = Router();
 
@@ -32,6 +33,7 @@ articleRouter.get(
 
 articleRouter.post(
     '/',
+    authMiddleware,
     titleValidator,
     authorValidator,
     textValidator,
@@ -41,6 +43,7 @@ articleRouter.post(
 
 articleRouter.put(
     '/:id',
+    authMiddleware,
     idValidator,
     textValidator,
     titleValidator,
@@ -50,6 +53,7 @@ articleRouter.put(
 
 articleRouter.delete(
     '/:id',
+    authMiddleware,
     idValidator,
     validationResultMiddleware,
     ArticleController.deleteArticle
