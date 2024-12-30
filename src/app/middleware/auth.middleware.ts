@@ -6,9 +6,9 @@ const authMiddleware = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     if (req.method === 'OPTIONS') {
-        return next(); 
+        return next();
     }
 
     try {
@@ -16,22 +16,21 @@ const authMiddleware = async (
             req.headers.authorization?.split(' ')[1];
 
         if (!token) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            res.status(401).json({ message: 'Unauthorized' });
+        } else {
+            const payload: JwtPayload = jwt.verify(
+                token,
+                JWT_SECRET
+            ) as JwtPayload;
 
+            (req as any).user.id = payload.userId;
+
+            next();
         }
-
-        const decodedData = jwt.verify(token, JWT_SECRET) as JwtPayload;
-
-        (req as any).user = { id: decodedData.userId };
-
-        next();
     } catch (error) {
         if (error instanceof JsonWebTokenError) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            res.status(401).json({ message: 'Unauthorized' });
         }
-
-        console.error('Unexpected error in authMiddleware:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
 

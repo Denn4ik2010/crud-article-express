@@ -7,35 +7,21 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=development
-    volumes:
-      - .:/app
-    command: ["yarn", "dev"]
+    env_file:
+      - .env
     depends_on:
-      - mongo_server
+      - mongo
+    volumes:
+      - .:/usr/src/app
+    command: npm start
 
-  test:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - mongo_server
-    command: ["yarn", "test:e2e"]
-    environment:
-      - NODE_ENV=test
-    volumes:
-      - .:/app
-  mongo_server:
+  mongo:
     image: mongo:4.4
+    container_name: mongodb
     ports:
       - "27017:27017"
     volumes:
-      - mongo-data:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=example
+      - mongo_data:/data/db
 
 volumes:
-  mongo-data:
-# FIXME: Fix docker compose file and fix connection to mongo in docker container
+  mongo_data:

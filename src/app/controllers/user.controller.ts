@@ -1,5 +1,5 @@
 import { IUser } from '../types/user.types';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import UserService from '../services/user.service';
 import NotFoundError from '../errors/not-found.error';
 import { UserViewModel } from '../models/users-view.model';

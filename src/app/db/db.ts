@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
-import { MONGO_URI } from '../config/constants';
+import { DATABASE_URL } from '../config/constants';
 
 export async function runDb() {
     mongoose
-        .connect(MONGO_URI, {
+        .connect(DATABASE_URL, {
             serverSelectionTimeoutMS: 5000, // Устанавливает максимальный таймаут для подключения
         })
         .then(() => {
-            console.log(`Connected to ${MONGO_URI}`);
+            console.log(`Connected to ${DATABASE_URL}`);
         })
         .catch((err) => {
             console.error('MongoDB connection error:', err);
