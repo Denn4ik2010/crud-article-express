@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import AuthService from '../services/auth.service';
 import AlreadyExistsError from '../errors/user-alredy-exist.error';
 import IncorrectPasswordError from '../errors/incorrect-password.error';
